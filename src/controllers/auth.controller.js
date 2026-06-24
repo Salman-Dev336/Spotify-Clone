@@ -29,6 +29,28 @@ async function registerUser(req, res){
         role
     })
 
+    const token = jwt.sign({
+        id:user_id,
+        role:user.role,
+
+    },
+    process.env.JWT_SECRET,
+)
+
+res.cookies("token", token)
+
+
+res.status(201).json({
+    message: "user created sucessfully",
+
+    user:{
+        id:user._id,
+        username:user.username,
+        email:user.email,
+        role:user.role,
+
+    }
+})
 
 
 }
