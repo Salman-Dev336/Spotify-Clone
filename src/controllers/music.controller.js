@@ -24,13 +24,15 @@ async function createMusic(req, res) {
     const { title } = req.body;
     const file = req.file;
 
-    const result = await uploadFile(file.buffer.toString("base64"));
-
-    if (!file) {
+      if (!file) {
       return res.status(400).json({
         message: "Music file is required",
       });
     }
+
+    const result = await uploadFile(file.buffer.toString("base64"));
+
+  
 
     const music = await musicModel.create({
       uri: result.url,
@@ -67,17 +69,17 @@ async function createAlbum(req, res) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (decoded !== artist) {
+    if (decoded.role !== "artist") {
       return res.status(401).json({
         message: "you dont have access to create album",
       });
     }
 
-    const { title, musicIds } = req.body;
+    const { title, musics } = req.body;
     const album = await albumModel.create({
       title,
       artist: decoded.id,
-      musics: musicIds,
+      musics: musics,
     });
 
     res.status(201).json({
