@@ -59,48 +59,42 @@ async function createAlbum(req, res) {
   const token = req.cookies.token;
 
   if (!token) {
-
     return res.status(401).json({
-        message:"unauthorized"
-    })
+      message: "unauthorized",
+    });
   }
 
   try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-
-    if(decoded !== artist){
-        return res.status(401).json({
-            message:"you dont have access to create album"
-        })
+    if (decoded !== artist) {
+      return res.status(401).json({
+        message: "you dont have access to create album",
+      });
     }
 
-    const {title, musicIds} = req.body;
+    const { title, musicIds } = req.body;
     const album = await albumModel.create({
-        title,
-        artist:decoded.id,
-        musics:musicIds
-
-    })
+      title,
+      artist: decoded.id,
+      musics: musicIds,
+    });
 
     res.status(201).json({
-        message:"album created sucessfully",
-        album:{
-            id:album._id,
-            title: album.title,
-            artist:album.artist,
-            musics: album.musics
-        }
-    })
-    
+      message: "album created sucessfully",
+      album: {
+        id: album._id,
+        title: album.title,
+        artist: album.artist,
+        musics: album.musics,
+      },
+    });
   } catch (error) {
     console.log(error);
     return res.status(401).json({
-        message:"auauthorized"
-    })
-    
-    
+      message: "auauthorized",
+    });
   }
 }
 
-module.exports = { createMusic };
+module.exports = { createMusic, createAlbum };
