@@ -1,40 +1,60 @@
 const jwt = require("jsonwebtoken");
 
+async function authArtist(req, res, next) {
+  const token = req.cookies.token;
 
-async function authArtist(req, res, next){
+  if (!token) {
+    return res.status(401).json({
+      message: "unauthorized",
+    });
+  }
 
-    const token = req.cookies.token;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if(!token){
-        return res.status(401).json({
-            message:"unauthorized"
-        })
+    if (decoded.role !== "artist") {
+      return res.status(403).json({
+        message: "you dont have access",
+      });
     }
 
-    try {
+    req.user = decoded;
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    next();
+  } catch (error) {
+    console.log(error);
 
-        if(decoded.role !== "artist"){
-            return res.status(403).json({
-                message:"you dont have access"
-            })
-        }
-
-        req.user = decoded;
-
-        next();
-        
-    } catch (error) {
-        console.log(error);
-
-        return res.status(401).json({
-            message:"unauthorized"
-        })
-        
-        
-    }
-
+    return res.status(401).json({
+      message: "unauthorized",
+    });
+  }
 }
 
-module.exports = {authArtist};
+async function authUser(req, res, next) {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({
+      message: "unauthorized",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.role !== "user" && decoded.role !== "artist") {
+      return res.status(403).json({
+        message: "you dont have acess to get the musics",
+      });
+    }
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({
+      message: "unauthorized",
+    });
+  }
+}
+
+module.exports = { authArtist, authUser };
