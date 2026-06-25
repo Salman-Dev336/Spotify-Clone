@@ -66,32 +66,32 @@ async function loginUser(req, res) {
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
-    if(!isPasswordValid){
+    if (!isPasswordValid) {
         return res.status(401).json({
-            message:"inavlid credentials"
+            message: "inavlid credentials"
         })
     }
 
     const token = jwt.sign({
-        id:user._id,
-        role:user.role
+        id: user._id,
+        role: user.role
     },
-    process.env.JWT_SECRET
-)
+        process.env.JWT_SECRET
+    )
 
-res.cookie("token", token)
+    res.cookie("token", token)
 
-res.status(200).json({
-    message:"user logged in sucessfully",
-    user:{
-        id:user._id,
-        username:user.username,
-        email:user.email,
-        role:user.role
-    }
-})
+    res.status(200).json({
+        message: "user logged in sucessfully",
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role
+        }
+    })
 
 }
 
 
-module.exports = { registerUser };
+module.exports = { registerUser, loginUser };
