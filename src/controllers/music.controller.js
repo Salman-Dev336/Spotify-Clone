@@ -1,5 +1,5 @@
 const musicModel = require("../models/music.model");
-const {musicUpload} = require("../services/storage.services");
+const {uploadFile} = require("../services/storage.services");
 const jwt = require("jsonwebtoken");
 
 
@@ -19,24 +19,23 @@ async function createMusic(req, res){
 
        if(decoded.role !== "artist"){
         return res.status(403).json({
-            message:"to dont have access to create music"
+            message:"you dont have access to create music"
         })
        }
-
-
-        
-    } catch (error) {
-        return res.status(401).json({
-            message:"unauthorized"
-        })
-        
-    }
 
     const{title} = req.body;
     const file = req.file;
 
 
     const result = await uploadFile(file.buffer.toString('base64') )
+
+    if (!file) {
+    return res.status(400).json({
+        message: "Music file is required"
+    });
+}
+
+    
 
 
     const music = await musicModel.create({
@@ -55,6 +54,17 @@ async function createMusic(req, res){
             artist:music.artist
         }
     })
+
+     } catch (error) {
+
+        console.log(error);
+
+
+        return res.status(401).json({
+            message:error.message
+        });
+        
+    }
 
 }
 

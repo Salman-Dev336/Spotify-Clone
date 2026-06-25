@@ -19,4 +19,4 @@ async function uploadFile(file){
 }
 
 
-exports.module = { uploadFile }
+module.exports = { uploadFile };
